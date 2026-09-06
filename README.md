@@ -11,7 +11,7 @@ This project takes MoMo (Mobile Money) SMS data in XML format, cleans it up, and
 - Nadiv Gicheru
 
 ## System Architecture
-High-level architecture diagram: _[Add Draw.io / Miro link here once created]_
+High-level architecture diagram: _[Add Draw.io / Miro link here]_
 
 ## Scrum Board
 Track our tasks (To Do / In Progress / Done): _https://trello.com/b/BhmRjvQo/group-0-momo-sms_
