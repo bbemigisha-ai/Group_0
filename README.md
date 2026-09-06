@@ -1,2 +1,5 @@
 # Group_0
-Team Repository
+Team Members
+-Bemigisha Bertha Mbonimpa
+-Kirabo Karyna Kiwagama
+-Nadiv Gicheru
