@@ -1,41 +1,89 @@
-{
-  "txCategories": {
-    "categoryID": "string",
-    "categoryName": "string",
-    "description": "string"
-  },
+[
+    {
+    "txCategories": {
+        "categoryID": "string",
+        "categoryName": "string",
+        "description": "string"
+    },
 
-  "customers": {
-    "customerID": "number",
-    "customerName": "string",
-    "phoneNumber": "string"
-  },
+    "customers": {
+        "customerID": "number",
+        "customerName": "string",
+        "phoneNumber": "string"
+    },
 
-  "Transactions": {
-    "txId": "number",
-    "categoryID": "string",
-    "recipientID": "number",
-    "senderID": "number",
-    "txDate": "string",
-    "txTime": "string",
-    "updatedBalance": "number",
-    "txAmount": "number",
-    "txFee": "number",
-    "currency": "string",
-    "status": "string"
-  },
+    "Transactions": {
+        "txId": "number",
+        "categoryID": "string",
+        "recipientID": "number",
+        "senderID": "number",
+        "txDate": "string",
+        "txTime": "string",
+        "updatedBalance": "number",
+        "txAmount": "number",
+        "txFee": "number",
+        "currency": "string",
+        "status": "string"
+    },
 
-  "SystemLogs": {
-    "logID": "number",
-    "txID": "number",
-    "createdAt": "string",
-    "rawMessage": "string"
-  },
+    "SystemLogs": {
+        "logID": "number",
+        "txID": "number",
+        "createdAt": "string",
+        "rawMessage": "string"
+    },
 
-  "CustomerTransaction": {
-    "customerTxID": "number",
-    "customerID": "number",
-    "txID": "number",
-    "role": "string"
-  }
-}
+    "CustomerTransaction": {
+        "customerTxID": "number",
+        "customerID": "number",
+        "txID": "number",
+        "role": "string"
+    }
+    },
+
+    {
+    "transaction": {
+        "txId": 59168184137,
+        "txDate": " 2024-05-24",
+        "txTime": "23:07:44",
+        "txAmount": 2000.00,
+        "txFee": 0.00,
+        "updatedBalance": 3050.00,
+        "currency": "RWF",
+        "status": "SUCCESS",
+
+        "category": {
+        "categoryID": "PAY",
+        "categoryName": "Payment",
+        "description": "Funds added to account"
+        },
+
+        "sender": {
+        "customerID": 36521838,
+        "customerName": "Group 0",
+        "phoneNumber": "0789123456",
+        "role": "sender"
+        },
+
+        "recipient": {
+        "customerID": 14717,
+        "customerName": "Alex Doe",
+        "phoneNumber": "0789001122",
+        "role": "recipient"
+        },
+
+        "systemLogs": [
+        {
+            "logID": 88,
+            "createdAt": "2025-09-23T14:30:00Z",
+            "rawMessage": "Your payment of 2,000 RWF to Alex Doe 14717 has been completed at 2024-05-24 23:07:44."
+        },
+        {
+            "logID": 89,
+            "createdAt": "2025-09-23T14:31:00Z",
+            "rawMessage": "Your new balance: 3,050 RWF. Fee was 0 RWF."
+        }
+        ]
+        }
+    }
+ ]
