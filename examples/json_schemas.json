@@ -1,0 +1,41 @@
+{
+  "txCategories": {
+    "categoryID": "string",
+    "categoryName": "string",
+    "description": "string"
+  },
+
+  "customers": {
+    "customerID": "number",
+    "customerName": "string",
+    "phoneNumber": "string"
+  },
+
+  "Transactions": {
+    "txId": "number",
+    "categoryID": "string",
+    "recipientID": "number",
+    "senderID": "number",
+    "txDate": "string",
+    "txTime": "string",
+    "updatedBalance": "number",
+    "txAmount": "number",
+    "txFee": "number",
+    "currency": "string",
+    "status": "string"
+  },
+
+  "SystemLogs": {
+    "logID": "number",
+    "txID": "number",
+    "createdAt": "string",
+    "rawMessage": "string"
+  },
+
+  "CustomerTransaction": {
+    "customerTxID": "number",
+    "customerID": "number",
+    "txID": "number",
+    "role": "string"
+  }
+}
