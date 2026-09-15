@@ -10,6 +10,9 @@ This project takes MoMo (Mobile Money) SMS data in XML format, cleans it up, and
 - Kirabo Karyna Kiwagama
 - Nadiv Gicheru
 
+## Team Task Sheet
+https://docs.google.com/spreadsheets/d/1CQbXaVT_BGN0rENaPyD16J1KZtcKcp_oXJ-TXU_im1Y/edit?usp=sharing
+
 ## Scrum Board
 
 Track our tasks (To Do / In Progress / Done): _https://trello.com/b/BhmRjvQo/group-0-momo-sms_
