@@ -5,6 +5,21 @@ import json
 INPUT_FILE = "modified_sms_v2.xml"
 OUTPUT_FILE = "transactions.json"
 
+# this dictionary will hold the mapping of customer names to their unique IDs
+CUSTOMER_LOOKUP = {}
+_customer_id_counter = 1
+
+# this function assigns a given customerID for a given name
+def get_or_create_customer_id(name):
+    global _customer_id_counter
+    if not name:
+        return None
+    if name not in CUSTOMER_LOOKUP:
+        CUSTOMER_LOOKUP[name] = _customer_id_counter
+        _customer_id_counter += 1
+    return CUSTOMER_LOOKUP[name] 
+    
+
 # starting of with the main core helper function to extract the number and amount from the body
 def extract_number(body, pattern, default=None):
     match = re.search(pattern, body)
@@ -52,21 +67,64 @@ def parse_sms(sms_element, new_id):
     body = sms_element.get("body", "")
     txn_type = classify(body)
 
+    #now we extract the name based on the transaction type
     sender = extract_name(body, "from") if txn_type == "incoming_money" else None
     recipient = extract_name(body, "to") if txn_type in ["transfer", "payment", "airtime_purchase", "bundle_purchase"] else None
 
+    if txn_type == "incoming_money":
+        active_customer_name = sender
+        active_role = "sender"
+    else:
+        active_customer_name = recipient 
+        active_role = "recepient"
+
+    sender_id = get_or_create_customer_id(sender)
+    recipient_id = get_or_create_customer_id(recipient)
+    active_customer_id = get_or_create_customer_id(active_customer_name)
+
+
     # this is the record style dictionary that will hold all the extracted information from the sms
     record = {
-        "id": new_id,
-        "type": txn_type,
-        "amount": extract_amount(body),
-        "fee": extract_fee(body),
-        "balance": extract_balance(body),
-        "sender": sender,
-        "recipient": recipient,
-        "timestamp": sms_element.get("readable_date", ""),
-        "raw_body": body,
+    "txCategories": {
+        "categoryID": f"CAT_{txn_type.upper()}",
+        "categoryName": txn_type,
+        "description": f"Transaction category for {txn_type}"
+    },
 
+    "customers": {
+            "customerID": active_customer_id,
+            "customerName": active_customer_name,
+            "phoneNumber": sms_element.get("address", "")
+    },
+
+
+    "Transactions": {
+            "txId": new_id,
+            "categoryID": f"CAT_{txn_type.upper()}",
+            "recipientID": recipient_id,
+            "senderID": sender_id,
+            "txDate": sms_element.get("readable_date", ""),
+            "txTime": sms_element.get("readable_time", ""),
+            "updatedBalance": extract_balance(body),
+            "txAmount": extract_amount(body),
+            "txFee": extract_fee(body),
+            "currency": "RWF",
+            "status": "SUCCESS"
+        },
+
+    "SystemLogs": {
+            "logID": new_id,
+            "txID": new_id,
+            "createdAt": sms_element.get("readable_date", ""),
+            "rawMessage": body
+        },
+    
+    "CustomerTransaction": {
+            "customerTxID": new_id,
+            "customerID": active_customer_id,
+            "txID": new_id,
+            "role": active_role
+        }
     }
     return record
 
