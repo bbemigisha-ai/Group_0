@@ -1,8 +1,15 @@
-import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import base64
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
+from pathlib import Path
 
-transactions = []
+JSON_FILE = (
+    Path(__file__).parent.parent
+    / "data"
+    / "converted_transactions"
+    / "transactions.json"
+)
+
 
 USERS = {"Karyna": "kk89", "Bertha": "bm67", "Nadiv": "ng25", "Guest": "getout"}
 
@@ -19,7 +26,21 @@ def check_auth(header):
     return USERS.get(username) == password
 
 
+def load_transactions():
+    if not JSON_FILE.exists():
+        return []
+
+    with JSON_FILE.open("r", encoding="utf-8") as file:
+        records = json.load(file)
+
+    return [record["Transactions"] for record in records if "Transactions" in record]
+
+
+transactions = load_transactions()
+
+
 class MomoTxHandler(BaseHTTPRequestHandler):
+
     def _set_headers(self, status=200, content_type="application/json"):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
@@ -96,8 +117,22 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                 content = self.rfile.read(content_length)
                 data = json.loads(content)
 
+                def next_transaction_id():
+                    return (
+                        max(
+                            (
+                                int(transaction["Transactions"]["txId"])
+                                for transaction in transactions
+                                if transaction.get("Transactions", {}).get("txId")
+                                is not None
+                            ),
+                            default=0,
+                        )
+                        + 1
+                    )
+
                 new_transaction = {
-                    "txId": len(transactions) + 1,
+                    "txId": next_transaction_id(),
                     "categoryID": data["categoryID"],
                     "recipientID": int(data["recipientID"]),
                     "senderID": int(data["senderID"]),
