@@ -1,0 +1,37 @@
+{
+  "txCategories": {
+    "categoryID": "CAT_PAYMENT",
+    "categoryName": "payment",
+    "description": "Transaction category for payment"
+  },
+  "customers": {
+    "customerID": 2,
+    "customerName": "Samuel Carter",
+    "phoneNumber": "M-Money"
+  },
+  "Transactions": {
+    "txId": 5,
+    "categoryID": "CAT_PAYMENT",
+    "recipientID": 2,
+    "senderID": null,
+    "txDate": "11 May 2024 6:48:49 PM",
+    "txTime": "",
+    "updatedBalance": null,
+    "txAmount": 2000,
+    "txFee": 0,
+    "currency": "RWF",
+    "status": "SUCCESS"
+  },
+  "SystemLogs": {
+    "logID": 5,
+    "txID": 5,
+    "createdAt": "11 May 2024 6:48:49 PM",
+    "rawMessage": "TxId: 17818959211. Your payment of 2,000 RWF to Samuel Carter 14965 has been completed at 2024-05-11 18:48:42. Your new balance: 38,400 RWF. Fee was 0 RWF.Kanda*182*16# wiyandikishe muri poromosiyo ya BivaMoMotima, ugire amahirwe yo gutsindira ibihembo bishimishije."
+  },
+  "CustomerTransaction": {
+    "customerTxID": 5,
+    "customerID": 2,
+    "txID": 5,
+    "role": "recepient"
+  }
+}
