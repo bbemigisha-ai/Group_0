@@ -121,10 +121,9 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                     return (
                         max(
                             (
-                                int(transaction["Transactions"]["txId"])
+                                int(transaction["txId"])
                                 for transaction in transactions
-                                if transaction.get("Transactions", {}).get("txId")
-                                is not None
+                                if transaction.get("txId") is not None
                             ),
                             default=0,
                         )
@@ -158,7 +157,6 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             self._set_headers(404)
             self.wfile.write(json.dumps({"error": "Path not found"}).encode("utf-8"))
 
-
     def do_PUT(self):
         if not self.require_auth():
             return
@@ -167,16 +165,13 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             transaction_id = self.path.split("/")[-1]
 
             transaction = next(
-                (t for t in transactions if str(t["txId"]) == transaction_id),
-                None
+                (t for t in transactions if str(t["txId"]) == transaction_id), None
             )
 
             if transaction is None:
                 self._set_headers(404)
                 self.wfile.write(
-                    json.dumps(
-                        {"error": "Transaction not found"}
-                    ).encode("utf-8")
+                    json.dumps({"error": "Transaction not found"}).encode("utf-8")
                 )
                 return
 
@@ -185,9 +180,7 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             if content_type != "application/json":
                 self._set_headers(415)
                 self.wfile.write(
-                    json.dumps(
-                        {"error": "Content must be JSON!"}
-                    ).encode("utf-8")
+                    json.dumps({"error": "Content must be JSON!"}).encode("utf-8")
                 )
                 return
 
@@ -196,9 +189,7 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             if content_length == 0:
                 self._set_headers(400)
                 self.wfile.write(
-                    json.dumps(
-                        {"error": "Content must not be empty"}
-                    ).encode("utf-8")
+                    json.dumps({"error": "Content must not be empty"}).encode("utf-8")
                 )
                 return
 
@@ -220,25 +211,15 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                         transaction[key] = value
 
                 self._set_headers(200)
-                self.wfile.write(
-                    json.dumps(transaction).encode("utf-8")
-                )
+                self.wfile.write(json.dumps(transaction).encode("utf-8"))
 
             except json.JSONDecodeError:
                 self._set_headers(400)
-                self.wfile.write(
-                    json.dumps(
-                        {"error": "Invalid JSON"}
-                    ).encode("utf-8")
-                )
+                self.wfile.write(json.dumps({"error": "Invalid JSON"}).encode("utf-8"))
 
         else:
             self._set_headers(404)
-            self.wfile.write(
-                json.dumps(
-                    {"error": "Path not found"}
-                ).encode("utf-8")
-            )
+            self.wfile.write(json.dumps({"error": "Path not found"}).encode("utf-8"))
 
     def do_DELETE(self):
         if not self.require_auth():
@@ -248,16 +229,13 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             transaction_id = self.path.split("/")[-1]
 
             transaction = next(
-                (t for t in transactions if str(t["txId"]) == transaction_id),
-                None
+                (t for t in transactions if str(t["txId"]) == transaction_id), None
             )
 
             if transaction is None:
                 self._set_headers(404)
                 self.wfile.write(
-                    json.dumps(
-                        {"error": "Transaction not found"}
-                    ).encode("utf-8")
+                    json.dumps({"error": "Transaction not found"}).encode("utf-8")
                 )
                 return
 
@@ -268,18 +246,14 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                 json.dumps(
                     {
                         "message": "Transaction deleted successfully",
-                        "transaction": transaction
+                        "transaction": transaction,
                     }
                 ).encode("utf-8")
             )
 
         else:
             self._set_headers(404)
-            self.wfile.write(
-                json.dumps(
-                    {"error": "Path not found"}
-                ).encode("utf-8")
-            )        
+            self.wfile.write(json.dumps({"error": "Path not found"}).encode("utf-8"))
 
 
 def run():
