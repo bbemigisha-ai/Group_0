@@ -42,7 +42,7 @@ def extract_balance(body):
     return extract_number(body, r"Balance:?\s*([\d,]+)\s*RWF", default=None)
 
 
-# now extracting the name of the sender or recepient from the body of the sms using regex patterns
+# now extracting the name of the sender or recipient from the body of the sms using regex patterns
 def extract_name(body, keyword):
     pattern = keyword + r"\s+([A-Za-z][A-Za-z .]*?)\s*(?:\(|\d|has|from|$)"
     match = re.search(pattern, body)
@@ -87,7 +87,7 @@ def parse_sms(sms_element, new_id):
         active_role = "sender"
     else:
         active_customer_name = recipient
-        active_role = "recepient"
+        active_role = "recipient"
 
     sender_id = get_or_create_customer_id(sender)
     recipient_id = get_or_create_customer_id(recipient)
