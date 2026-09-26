@@ -159,6 +159,129 @@ class MomoTxHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Path not found"}).encode("utf-8"))
 
 
+    def do_PUT(self):
+        if not self.require_auth():
+            return
+
+        if self.path.startswith("/transactions/"):
+            transaction_id = self.path.split("/")[-1]
+
+            transaction = next(
+                (t for t in transactions if str(t["txId"]) == transaction_id),
+                None
+            )
+
+            if transaction is None:
+                self._set_headers(404)
+                self.wfile.write(
+                    json.dumps(
+                        {"error": "Transaction not found"}
+                    ).encode("utf-8")
+                )
+                return
+
+            content_type = self.headers.get("Content-Type")
+
+            if content_type != "application/json":
+                self._set_headers(415)
+                self.wfile.write(
+                    json.dumps(
+                        {"error": "Content must be JSON!"}
+                    ).encode("utf-8")
+                )
+                return
+
+            content_length = int(self.headers.get("Content-Length", 0))
+
+            if content_length == 0:
+                self._set_headers(400)
+                self.wfile.write(
+                    json.dumps(
+                        {"error": "Content must not be empty"}
+                    ).encode("utf-8")
+                )
+                return
+
+            try:
+                content = self.rfile.read(content_length)
+                data = json.loads(content)
+
+                if not isinstance(data, dict):
+                    self._set_headers(400)
+                    self.wfile.write(
+                        json.dumps(
+                            {"error": "Request body must be a JSON object"}
+                        ).encode("utf-8")
+                    )
+                    return
+
+                for key, value in data.items():
+                    if key != "txId":
+                        transaction[key] = value
+
+                self._set_headers(200)
+                self.wfile.write(
+                    json.dumps(transaction).encode("utf-8")
+                )
+
+            except json.JSONDecodeError:
+                self._set_headers(400)
+                self.wfile.write(
+                    json.dumps(
+                        {"error": "Invalid JSON"}
+                    ).encode("utf-8")
+                )
+
+        else:
+            self._set_headers(404)
+            self.wfile.write(
+                json.dumps(
+                    {"error": "Path not found"}
+                ).encode("utf-8")
+            )
+
+    def do_DELETE(self):
+        if not self.require_auth():
+            return
+
+        if self.path.startswith("/transactions/"):
+            transaction_id = self.path.split("/")[-1]
+
+            transaction = next(
+                (t for t in transactions if str(t["txId"]) == transaction_id),
+                None
+            )
+
+            if transaction is None:
+                self._set_headers(404)
+                self.wfile.write(
+                    json.dumps(
+                        {"error": "Transaction not found"}
+                    ).encode("utf-8")
+                )
+                return
+
+            transactions.remove(transaction)
+
+            self._set_headers(200)
+            self.wfile.write(
+                json.dumps(
+                    {
+                        "message": "Transaction deleted successfully",
+                        "transaction": transaction
+                    }
+                ).encode("utf-8")
+            )
+
+        else:
+            self._set_headers(404)
+            self.wfile.write(
+                json.dumps(
+                    {"error": "Path not found"}
+                ).encode("utf-8")
+            )        
+
+
 def run():
     server_address = ("", 8080)
     httpd = HTTPServer(server_address, MomoTxHandler)
