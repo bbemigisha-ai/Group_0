@@ -11,6 +11,7 @@ This project takes MoMo (Mobile Money) SMS data in XML format, cleans it up, and
 - Nadiv Gicheru
 
 ## Team Task Sheet
+
 https://docs.google.com/spreadsheets/d/1CQbXaVT_BGN0rENaPyD16J1KZtcKcp_oXJ-TXU_im1Y/edit?usp=sharing
 
 ## Scrum Board
@@ -38,7 +39,46 @@ Track our tasks (To Do / In Progress / Done): _https://trello.com/b/BhmRjvQo/gro
 | **CustomerTransaction** | role           | sender.role                      |
 |                         |                | recipient.role                   |
 
-```
+## Running the API
 
+1. Clone the API:
+   `git clone https://github.com/bbemigisha-ai/Group_0.git`
 
+2. From the directory run:
+   ` python etl/main.py`
+   or
+   ` python3 etl/main.py - if you're using macOS`
+
+The server runs at:
+
+http://localhost:8080
+
+The API reads the parsed transaction data in data/converted_transactions/api_transactions.json
+
+## Authentication
+
+All endpoints require HTTP Basic Auth
+
+for testing you could use:
+| **Username** | **Password** |
+| ----------------------- |----|
+| **karyna** | kk89|
+| **bertha** | bm67 |
+| **nadiv** | ng25 |
+| **Guest** | ng25 |
+
+It's important to note that Basic Auth must be used over HTTPS in production and Base64 does not actually encrypt credentials. For stronger security we recommend implementing alternatives that are stronger i.e. OAuth2
+
+## Reference Table for Endpoints
+
+```markdown
+## Endpoints
+
+| Method | Endpoint             | Description                    | Success |
+| ------ | -------------------- | ------------------------------ | ------- |
+| GET    | `/transactions`      | List all transactions          | 200     |
+| GET    | `/transactions/{id}` | Get one transaction            | 200     |
+| POST   | `/transactions`      | Create a transaction           | 201     |
+| PUT    | `/transactions/{id}` | Partially update a transaction | 200     |
+| DELETE | `/transactions/{id}` | Delete a transaction           | 200     |
 ```
