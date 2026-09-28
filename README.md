@@ -82,3 +82,38 @@ It's important to note that Basic Auth must be used over HTTPS in production and
 | PUT    | `/transactions/{id}` | Partially update a transaction | 200     |
 | DELETE | `/transactions/{id}` | Delete a transaction           | 200     |
 ```
+
+## Request, Response & Tests
+
+For test examples of the different requests and their responses, please see `screenshots/api_requests`
+
+## Validation and Error Codes
+
+```markdown
+## Validation and Errors
+
+| Status | Meaning                                         |
+| ------ | ----------------------------------------------- |
+| 200    | Successful GET, PUT, or DELETE                  |
+| 201    | Transaction created                             |
+| 400    | Invalid JSON, missing fields, or invalid values |
+| 401    | Missing or invalid credentials                  |
+| 404    | Transaction or route not found                  |
+| 415    | Request body is not JSON                        |
+
+Transactions must have a positive amount, a non-negative fee, valid numeric IDs,
+and valid JSON fields.
+```
+
+For some test examples, please see `screenshots/api_requests`
+
+- Some other tested behaviours include:
+- Successful authentication
+- Invalid and malformed authentication
+- Listing transactions
+- Retrieving one transaction
+- Creating a transaction
+- Updating a transaction
+- Deleting a transaction
+- Persistence after restarting the server
+- Invalid JSON and invalid field values
