@@ -1,0 +1,63 @@
+##POST request
+curl -X POST http://localhost:8080/transactions \
+  -u Guest:getout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "categoryID": "PAYMENT",
+    "recipientID": 2,
+    "senderID": 1,
+    "txDate": "27 September 2026",
+    "txTime": "14:30:00",
+    "updatedBalance": 15000,
+    "txAmount": 2000,
+    "txFee": 0,
+    "currency": "RWF",
+    "status": "SUCCESS"
+  }'
+
+## Verify Persistence
+
+curl http://localhost:8080/transactions \
+  -u Guest:getout
+
+## PUT request
+curl -X PUT http://localhost:8080/transactions/1 \
+  -u Guest:getout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "updatedBalance": 18500,
+    "txFee": 50,
+    "status": "SUCCESS"
+  }'
+
+  ## GET request
+  ## GET all transactions
+curl -X GET http://localhost:8080/transactions \
+  -u Guest:getout
+
+  ## GET one transaction
+curl -X GET http://localhost:8080/transactions/1 \
+  -u Guest:getout
+
+## Delete requests
+curl -X DELETE http://localhost:8080/transactions/1 \
+  -u Guest:getout
+
+
+## Test PUT request validation
+
+curl -X PUT http://localhost:8080/transactions/1 \
+  -u Guest:getout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "txFee": "not-a-number"
+  }'
+
+
+## basic auth testing
+  ## Test missing header
+  curl -X GET http://localhost:8080/transactions \
+  -H "Authorization: Basic invalid-data"
+
+  ## Test with no credentials
+  curl -X GET http://localhost:8080/transactions
