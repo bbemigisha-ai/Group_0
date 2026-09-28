@@ -47,7 +47,7 @@ Track our tasks (To Do / In Progress / Done): _https://trello.com/b/BhmRjvQo/gro
 2. From the directory run:
    ` python etl/main.py`
    or
-   ` python3 etl/main.py - if you're using macOS`
+   `python3 etl/main.py`- if you're using macOS
 
 The server runs at:
 
@@ -107,7 +107,8 @@ and valid JSON fields.
 
 For some test examples, please see `screenshots/api_requests`
 
-- Some other tested behaviours include:
+Some other tested behaviours include:
+
 - Successful authentication
 - Invalid and malformed authentication
 - Listing transactions
