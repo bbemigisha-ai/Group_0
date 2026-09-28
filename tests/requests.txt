@@ -3,7 +3,7 @@ curl -X POST http://localhost:8080/transactions \
   -u Guest:getout \
   -H "Content-Type: application/json" \
   -d '{
-    "categoryID": "CAT_PAYMENT",
+    "categoryID": "PAYMENT",
     "recipientID": 2,
     "senderID": 1,
     "txDate": "27 September 2026",
@@ -42,4 +42,3 @@ curl -X GET http://localhost:8080/transactions/1 \
 ## Delete requests
 curl -X DELETE http://localhost:8080/transactions/1 \
   -u Guest:getout
-  
