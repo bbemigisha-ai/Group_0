@@ -1,4 +1,5 @@
 import base64
+import binascii
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from pathlib import Path
@@ -19,16 +20,80 @@ API_JSON_FILE = (
 
 USERS = {"Karyna": "kk89", "Bertha": "bm67", "Nadiv": "ng25", "Guest": "getout"}
 
+# validation scheme for PUT and/or POST data
+REQUIRED_FIELDS = [
+    "categoryID",
+    "recipientID",
+    "senderID",
+    "txDate",
+    "txTime",
+    "updatedBalance",
+    "txAmount",
+    "txFee",
+    "currency",
+]
+
+NUMBER_Fields = {
+    "recipientID": int,
+    "senderID": int,
+    "updatedBalance": float,
+    "txAmount": float,
+    "txFee": float,
+}
+
+
+def validate_transaction(data):
+
+    if not isinstance(data, dict):
+        return None, "Request body must be a JSON object"
+
+    missing_fields = [
+        field
+        for field in REQUIRED_FIELDS
+        if field not in data or data[field] in ("", None)
+    ]
+    if missing_fields:
+        return None, f"Missing fields: {', '.join(missing_fields)}"
+
+    # to not accidentally modify original dict while validation happens
+
+    cleaned_data = data.copy()
+
+    for field, converter in NUMBER_Fields.items():
+        try:
+            cleaned_data[field] = converter(data[field])
+        except (ValueError, TypeError):
+            return None, f"Field '{field}' must be a valid number"
+
+    # Obviously, transactions have to be > 0
+
+    if cleaned_data["txAmount"] <= 0:
+        return None, "txAmount must be greater than zero"
+
+    # to check that transaction fee is not -ve
+
+    if cleaned_data["txFee"] < 0:
+        return None, "txFee CANNOT be in the negative"
+
+    return cleaned_data, None
+
 
 def check_auth(header):
-    if not header or not header.startswith("Basic "):
+    if not header:
         return False
 
-    encoded = header.split(" ")[1]
-    decoded = base64.b64decode(encoded).decode()
+    try:
+        scheme, encoded = header.split(" ", 1)
 
-    username, password = decoded.split(":")
+        if scheme != "Basic" or not encoded:
+            return False
 
+        decoded = base64.b64decode(encoded, validate=True).decode("utf-8")
+
+        username, password = decoded.split(":", 1)
+
+    except (ValueError, UnicodeDecodeError, binascii.Error):
+        return False
     return USERS.get(username) == password
 
 
@@ -137,6 +202,15 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                 content = self.rfile.read(content_length)
                 data = json.loads(content)
 
+                cleaned_data, error = validate_transaction(data)
+
+                if error:
+                    self._set_headers(400)
+                    self.wfile.write(json.dumps({"error": error}).encode("utf-8"))
+                    return
+
+                data = cleaned_data
+
                 def next_transaction_id():
                     return (
                         max(
@@ -230,9 +304,55 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                     )
                     return
 
+                UPDATE_FIELDS = {
+                    "categoryID": str,
+                    "recipientID": int,
+                    "senderID": int,
+                    "txDate": str,
+                    "txTime": str,
+                    "updatedBalance": float,
+                    "txAmount": float,
+                    "txFee": float,
+                    "currency": str,
+                    "status": str,
+                }
+
+                cleaned_updates = {}
+
                 for key, value in data.items():
-                    if key != "txId":
-                        transaction[key] = value
+                    if key == "txId":
+                        self._set_headers(400)
+                        self.wfile.write(
+                            json.dumps({"error": "txID cannot be changed"}).encode(
+                                "utf-8"
+                            )
+                        )
+                        return
+
+                    if key not in UPDATE_FIELDS:
+                        self._set_headers(400)
+                        self.wfile.write(
+                            json.dumps({"error": f"Unknown field: {key}"}).encode(
+                                "utf-8"
+                            )
+                        )
+                        return
+
+                    try:
+                        cleaned_updates[key] = UPDATE_FIELDS[key](value)
+                    except (ValueError, TypeError):
+                        self._set_headers(400)
+                        self.wfile.write(
+                            json.dumps({"error": f"{key} has an invalid value"}).encode(
+                                "utf-8"
+                            )
+                        )
+
+                        return
+
+                for key, value in cleaned_updates.items():
+                    transaction[key] = value
+
                 save_transactions(records)
 
                 self._set_headers(200)
