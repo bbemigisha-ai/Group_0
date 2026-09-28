@@ -3,13 +3,19 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from pathlib import Path
 
-JSON_FILE = (
+SOURCE_JSON_FILE = (
     Path(__file__).parent.parent
     / "data"
     / "converted_transactions"
     / "transactions.json"
 )
 
+API_JSON_FILE = (
+    Path(__file__).parent.parent
+    / "data"
+    / "converted_transactions"
+    / "api_transactions.json"
+)
 
 USERS = {"Karyna": "kk89", "Bertha": "bm67", "Nadiv": "ng25", "Guest": "getout"}
 
@@ -27,16 +33,23 @@ def check_auth(header):
 
 
 def load_transactions():
-    if not JSON_FILE.exists():
+    file_path = API_JSON_FILE if API_JSON_FILE.exists() else SOURCE_JSON_FILE
+
+    if not file_path.exists():
         return []
 
-    with JSON_FILE.open("r", encoding="utf-8") as file:
+    with file_path.open("r", encoding="utf-8") as file:
         records = json.load(file)
+
+    if file_path == API_JSON_FILE:
+        return records
 
     return [record["Transactions"] for record in records if "Transactions" in record]
 
 
-transactions = load_transactions()
+def save_transactions(records):
+    with API_JSON_FILE.open("w", encoding="utf-8") as file:
+        json.dump(records, file, indent=4)
 
 
 class MomoTxHandler(BaseHTTPRequestHandler):
@@ -65,15 +78,19 @@ class MomoTxHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if not self.require_auth():
             return
+
+        records = load_transactions()
+
         if self.path == "/transactions":
             self._set_headers(200)
-            self.wfile.write(json.dumps(transactions).encode("utf-8"))
+            self.wfile.write(json.dumps(records).encode("utf-8"))
             return
 
         if self.path.startswith("/transactions/"):
             transaction_id = self.path.split("/")[-1]
             transaction = next(
-                (t for t in transactions if str(t["txId"]) == transaction_id), None
+                (record for record in records if str(record["txId"]) == transaction_id),
+                None,
             )
             if transaction is None:
                 self._set_headers(404)
@@ -94,6 +111,9 @@ class MomoTxHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.require_auth():
             return
+
+        records = load_transactions()
+
         if self.path == "/transactions":
             content_type = self.headers.get("Content-Type")
 
@@ -121,9 +141,9 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                     return (
                         max(
                             (
-                                int(transaction["txId"])
-                                for transaction in transactions
-                                if transaction.get("txId") is not None
+                                int(record["txId"])
+                                for record in records
+                                if record.get("txId") is not None
                             ),
                             default=0,
                         )
@@ -144,7 +164,8 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                     "status": data.get("status", "PENDING"),
                 }
 
-                transactions.append(new_transaction)
+                records.append(new_transaction)
+                save_transactions(records)
 
                 self._set_headers(201)
                 self.wfile.write(json.dumps(new_transaction).encode("utf-8"))
@@ -161,11 +182,14 @@ class MomoTxHandler(BaseHTTPRequestHandler):
         if not self.require_auth():
             return
 
+        records = load_transactions()
+
         if self.path.startswith("/transactions/"):
             transaction_id = self.path.split("/")[-1]
 
             transaction = next(
-                (t for t in transactions if str(t["txId"]) == transaction_id), None
+                (record for record in records if str(record["txId"]) == transaction_id),
+                None,
             )
 
             if transaction is None:
@@ -209,6 +233,7 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                 for key, value in data.items():
                     if key != "txId":
                         transaction[key] = value
+                save_transactions(records)
 
                 self._set_headers(200)
                 self.wfile.write(json.dumps(transaction).encode("utf-8"))
@@ -225,11 +250,14 @@ class MomoTxHandler(BaseHTTPRequestHandler):
         if not self.require_auth():
             return
 
+        records = load_transactions()
+
         if self.path.startswith("/transactions/"):
             transaction_id = self.path.split("/")[-1]
 
             transaction = next(
-                (t for t in transactions if str(t["txId"]) == transaction_id), None
+                (record for record in records if str(record["txId"]) == transaction_id),
+                None,
             )
 
             if transaction is None:
@@ -239,7 +267,8 @@ class MomoTxHandler(BaseHTTPRequestHandler):
                 )
                 return
 
-            transactions.remove(transaction)
+            records.remove(transaction)
+            save_transactions(records)
 
             self._set_headers(200)
             self.wfile.write(
