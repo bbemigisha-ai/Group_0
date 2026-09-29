@@ -25,18 +25,36 @@ def linear_search(transaction_list, transaction_id):
 
         if tx_id == transaction_id:
             return transaction
+
     return None
 
 
 if __name__ == "__main__":
     transaction_list = load_transactions()
 
-    transaction_id = 5
+    # Get the first 20 transaction IDs
+    transaction_ids = []
+
+    for transaction in transaction_list[:25]:
+        transaction_data = transaction.get("Transactions", {})
+        tx_id = transaction_data.get("txId")
+
+        if tx_id is not None:
+            transaction_ids.append(tx_id)
 
     start_time = time.perf_counter()
-    result = linear_search(transaction_list, transaction_id)
+
+    for transaction_id in transaction_ids:
+        linear_search(transaction_list, transaction_id)
+
     end_time = time.perf_counter()
 
-    print(result)
-    execution_time = end_time - start_time
-    print(f"Execution time: {execution_time:.6f} seconds")
+    total_time = end_time - start_time
+
+    print("Linear Search")
+    print(f"Records searched: {len(transaction_ids)}")
+    print(f"Total execution time: {total_time:.8f} seconds")
+
+    if transaction_ids:
+        average_time = total_time / len(transaction_ids)
+        print(f"Average search time: {average_time:.8f} seconds")
