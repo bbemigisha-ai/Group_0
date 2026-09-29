@@ -18,6 +18,11 @@ https://docs.google.com/spreadsheets/d/1CQbXaVT_BGN0rENaPyD16J1KZtcKcp_oXJ-TXU_i
 
 Track our tasks (To Do / In Progress / Done): _https://trello.com/b/BhmRjvQo/group-0-momo-sms_
 
+# # Report in PDF Form
+
+[GROUP_0_DOCUMENTATION.pdf](https://github.com/user-attachments/files/32779526/GROUP_0_DOCUMENTATION.pdf)
+
+
 ## SQL - JSON Mapping Table
 
 | **Entity**              | **JSON Field** | **SQL Field**                    |
